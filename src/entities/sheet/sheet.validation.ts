@@ -11,7 +11,6 @@ export const sheetSchema = Joi.object({
     ).required()
 }).required()
 
-
 export const updateRowRequest = Joi.object({
     columnId: Joi.string().hex().length(24).required(),
     row: Joi.number().integer().required(),

@@ -5,24 +5,33 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run build && node build/index.js",
-    "build": "npx tsc"
+    "build": "npx tsc",
+    "test": "jest --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.11",
     "@types/node": "^20.10.6",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@babel/preset-env": "^7.23.7",
     "@types/express": "^4.17.21",
+    "babel-jest": "^29.7.0",
     "body-parser": "^1.20.2",
     "crypto": "^1.0.1",
     "express": "^4.18.2",
     "http-status-codes": "^2.3.0",
     "joi": "^17.11.0",
     "mongodb": "^6.3.0",
-    "mongoose": "^8.0.3"
+    "mongoose": "^8.0.3",
+    "supertest": "^6.3.3"
   }
 }

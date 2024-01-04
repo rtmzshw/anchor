@@ -4,14 +4,14 @@ import { ObjectSchema } from "joi"
 
 const { logInfo } = require("./logger/logger")
 
-// use it before every route, helps with investigating problems
 export const routeDecorator = (routeFunction: (req: Request, res: Response, next: NextFunction) => any) => (req: Request, res: Response, next: NextFunction) => {
+    const startTime = Date.now()
     try {
-        logInfo("started handeling", routeFunction.name)
+        logInfo("started handeling", routeFunction.name,)
         routeFunction(req, res, next)
-        logInfo("success handeling", routeFunction.name)
+        logInfo("success handeling", { name: routeFunction.name, exectionDuration: Date.now() - startTime })
     } catch (error) {
-        logInfo("failed handeling", routeFunction.name)
+        logInfo("failed handeling", { name: routeFunction.name, exectionDuration: Date.now() - startTime })
         res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR)
     }
 }

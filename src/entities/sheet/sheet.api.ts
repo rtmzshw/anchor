@@ -1,19 +1,18 @@
-import { Router, Request, Response } from 'express'
-import { StatusCodes } from 'http-status-codes'
+import { Router } from 'express'
 import { routeDecorator, validateBody } from '../../utils'
-import { SheetModel, getColumn, updateColumnValue } from './sheet.db'
+import { createSheet, getSheet, getSheetExistence, updateRow } from './logic/sheet.logic'
 import { sheetSchema, updateRowRequest } from './sheet.validation'
-import { Sheet, ColumnType } from './sheet.type'
-import { validateValueByType } from './sheet.utils'
-import { createSheet, getSheet, updateRow } from './logic/sheet.logic'
+import { getSheetById } from './sheet.db'
 
 const sheetsRouter = Router()
 
 
 sheetsRouter.post('/', validateBody(sheetSchema), routeDecorator(createSheet))
 
-sheetsRouter.get('/:sheetId', routeDecorator(getSheet))
+//TODO check if sheet exists
+sheetsRouter.get('/:sheetId', getSheetExistence, routeDecorator(getSheet))
 
-sheetsRouter.put('/:sheetId',validateBody(updateRowRequest), routeDecorator(updateRow))
+sheetsRouter.put('/:sheetId', validateBody(updateRowRequest), getSheetExistence, routeDecorator(updateRow))
+
 
 export default sheetsRouter

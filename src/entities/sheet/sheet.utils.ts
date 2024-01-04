@@ -1,17 +1,17 @@
-import { ColumnType } from "./sheet.type";
+import { Action } from "./logic/actions/action";
+import { BasicAction } from "./logic/actions/basic";
+import { Lookup } from "./logic/actions/lookup";
+import { ActionType, Sheet } from "./sheet.type";
 
-//Choose it over OOP
-export const validateValueByType: Record<keyof typeof ColumnType, (value: any) => boolean> = {
-    
-    boolean: (v) => typeof v === 'boolean',
-
-    int: (v) => Number.isInteger(v),
-
-    double: (v) => typeof v === 'number' && !Number.isInteger(v),
-
-    string: (v) => typeof v === 'string',
-
-    lookup: (v) => typeof v === 'string',
+export const actionFactory: Record<keyof typeof ActionType, Action> = {
+    basic: new BasicAction(),
+    lookup: new Lookup()
 }
 
-export const isLookup =(value:string) => /^lookup\(\w+,\d+\)$/.test(value)
+//TODO think how to break this
+export const getActionType = (value: any): keyof typeof ActionType => {
+    if (isLookup(value)) return ActionType.lookup
+    else return ActionType.basic
+}
+
+export const isLookup = (value: string) => /^lookup\(\w+,\d+\)$/.test(value)

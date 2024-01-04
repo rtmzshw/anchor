@@ -4,9 +4,12 @@ export enum ColumnType {
     double = 'double',
     int = 'int',
     boolean = 'boolean',
-    lookup = "lookup"
 }
 
+export enum ActionType {
+    basic = "basic",
+    lookup = "lookup",
+}
 export interface Sheet {
     _id: string
     columns: Column[]
