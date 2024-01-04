@@ -9,7 +9,6 @@ const sheetsRouter = Router()
 
 sheetsRouter.post('/', validateBody(sheetSchema), routeDecorator(createSheet))
 
-//TODO check if sheet exists
 sheetsRouter.get('/:sheetId', getSheetExistence, routeDecorator(getSheet))
 
 sheetsRouter.put('/:sheetId', validateBody(updateRowRequest), getSheetExistence, routeDecorator(updateRow))

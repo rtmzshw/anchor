@@ -15,7 +15,7 @@ export const getSheet = async (req: Request, res: Response) => {
     const result = sheet.columns.map((column, index) => {
         const calculatedValues = Object.entries(column.values)?.map(([key, value]) => {
             const action = getActionType(value)
-            const calculationAction = actionFactory[action].calcValue
+            const calculationAction = actionFactory()[action].calcValue
             return { [key]: calculationAction(sheet!, value) }
         })
         return { id: column._id, name: column.name, values: calculatedValues }
@@ -35,13 +35,12 @@ export const updateRow = async (req: Request, res: Response) => {
     }
 
     const action = getActionType(value)
-    const validationFunction = actionFactory[action].validate
+    const validationFunction = actionFactory()[action].validate    
 
     if (!await validationFunction(sheetId, columnId, row, value)) {
         res.sendStatus(StatusCodes.BAD_REQUEST)
         return
     }
-
     await updateColumnValue(sheetId, columnId, row, value)
     res.sendStatus(StatusCodes.OK)
 
@@ -57,6 +56,5 @@ export const getSheetExistence = async (req: Request, res: Response, next: NextF
     }
     next()
 }
-//TODO edge case- lookup point to non existing cell
 
 

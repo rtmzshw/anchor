@@ -4,7 +4,6 @@ import { ColumnType, Sheet } from './sheet.type';
 const columnSchema = new mongoose.Schema({
     name: { type: String, required: true },
     type: { type: String, enum: ColumnType, required: true },
-    // TODO can be multiple types
     values: { type: Map, default: {} }
 });
 
@@ -21,6 +20,5 @@ export const getColumn = (sheetId: string, columnId: string) =>
 export const getSheetById = (sheetId: string, projection?: {}) =>
     SheetModel.findOne({ _id: sheetId }, projection).lean()
 
-//TODO improve any
 export const updateColumnValue = (sheetId: string, columnId: string, row: number, value: any) =>
     SheetModel.updateOne({ _id: sheetId, "columns._id": columnId }, { [`columns.$.values.${row}`]: value }).lean()

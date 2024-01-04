@@ -16,4 +16,3 @@ export const updateRowRequest = Joi.object({
     row: Joi.number().integer().required(),
     value: Joi.required()
 }).required()
-//TODO fix dev dependency

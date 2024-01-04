@@ -22,10 +22,11 @@ beforeAll(async () => {
 
 });
 afterAll(async () => {
+    await SheetModel.deleteMany({})
     await disconnectDb()
 });
 
-describe.skip('POST /sheet', () => {
+describe('POST /sheet', () => {
 
     it('responds id and adds DB', function (done) {
         request(app)

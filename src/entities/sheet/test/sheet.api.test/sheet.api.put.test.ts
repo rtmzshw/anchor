@@ -31,13 +31,54 @@ afterEach(async () => {
     await SheetModel.deleteMany({})
 });
 
-
-
 afterAll(async () => {
     await disconnectDb()
 });
 
-describe.skip('Success - PUT /sheet/:sheetId', () => {
+
+describe('Fails - PUT /sheet/:sheetId', () => {
+    it('wrong type assertion', async function () {
+        const sheet = (await getSheetById(sheetId))!
+        await request(app)
+            .put(`/sheet/${sheetId}`)
+            .set('Content-Type', 'application/json')
+            .set('Accept', 'application/json')
+            .send({ columnId: sheet.columns[0]._id, row: 1, value: "text" })
+            .expect(StatusCodes.BAD_REQUEST)
+
+    });
+
+    it('circular lookup', async function () {
+        const sheet = (await getSheetById(sheetId))!
+        await Promise.all([
+            sendPutRequest(sheet, { columnId: sheet.columns[0]._id, row: 1, value: true }),
+            sendPutRequest(sheet, { columnId: sheet.columns[4]._id, row: 5, value: `lookup(${sheet.columns[5]._id},80)` }),
+            sendPutRequest(sheet, { columnId: sheet.columns[5]._id, row: 80, value: `lookup(${sheet.columns[6]._id},4)` }),
+            sendPutRequest(sheet, { columnId: sheet.columns[6]._id, row: 4, value: `lookup(${sheet.columns[0]._id},1)` }),
+        ])
+
+        await request(app)
+            .put(`/sheet/${sheetId}`)
+            .set('Content-Type', 'application/json')
+            .set('Accept', 'application/json')
+            .send({ columnId: sheet.columns[0]._id, row: 1, value: `lookup(${sheet.columns[4]._id},5)` })
+            .expect(StatusCodes.BAD_REQUEST)
+
+    });
+
+    it('Fails because sheet dosent exists', function (done) {
+        request(app)
+            .get(`/sheet/${"badId"}`)
+            .set('Content-Type', 'application/json')
+            .set('Accept', 'application/json')
+            .expect(StatusCodes.NOT_FOUND)
+            .end(done)
+    });
+
+
+});
+
+describe('Success - PUT /sheet/:sheetId', () => {
     it('basic update', async function () {
         const sheet = (await getSheetById(sheetId))!
 
@@ -63,6 +104,7 @@ describe.skip('Success - PUT /sheet/:sheetId', () => {
         sheetMockCopy.columns[0].values = { "1": true, "2": false }
         sheetMockCopy.columns[1].values = { "5": 7 }
         sheetMockCopy.columns[2].values = { "80": 12.4 }
+
         expect(updatedSheet.columns).toMatchObject(sheetMockCopy.columns)
 
     });
@@ -70,10 +112,12 @@ describe.skip('Success - PUT /sheet/:sheetId', () => {
     it('multiple Lookup updates', async function () {
         const sheet = (await getSheetById(sheetId))!
 
-        await sendPutRequest(sheet, { columnId: sheet.columns[0]._id, row: 1, value: true });
-        await sendPutRequest(sheet, { columnId: sheet.columns[4]._id, row: 5, value: `lookup(${sheet.columns[5]._id},80)` });
-        await sendPutRequest(sheet, { columnId: sheet.columns[5]._id, row: 80, value: `lookup(${sheet.columns[6]._id},4)` });
-        await sendPutRequest(sheet, { columnId: sheet.columns[6]._id, row: 4, value: `lookup(${sheet.columns[0]._id},1)` });
+        await Promise.all([
+            sendPutRequest(sheet, { columnId: sheet.columns[0]._id, row: 1, value: true }),
+            sendPutRequest(sheet, { columnId: sheet.columns[4]._id, row: 5, value: `lookup(${sheet.columns[5]._id},80)` }),
+            sendPutRequest(sheet, { columnId: sheet.columns[5]._id, row: 80, value: `lookup(${sheet.columns[6]._id},4)` }),
+            sendPutRequest(sheet, { columnId: sheet.columns[6]._id, row: 4, value: `lookup(${sheet.columns[0]._id},1)` }),
+        ])
 
         const updatedSheet = (await getSheetById(sheetId))!
         const sheetMockCopy = { ...sheetMock }
@@ -81,50 +125,10 @@ describe.skip('Success - PUT /sheet/:sheetId', () => {
         sheetMockCopy.columns[4].values = { "5": `lookup(${sheet.columns[5]._id},80)` }
         sheetMockCopy.columns[5].values = { "80": `lookup(${sheet.columns[6]._id},4)` }
         sheetMockCopy.columns[6].values = { "4": `lookup(${sheet.columns[0]._id},1)` }
+        
         expect(updatedSheet.columns).toMatchObject(sheetMockCopy.columns)
 
     });
-
-});
-
-
-describe('Fails - PUT /sheet/:sheetId', () => {
-    it('wrong type assertion', async function () {
-        const sheet = (await getSheetById(sheetId))!
-        await request(app)
-            .put(`/sheet/${sheetId}`)
-            .set('Content-Type', 'application/json')
-            .set('Accept', 'application/json')
-            .send({ columnId: sheet.columns[0]._id, row: 1, value: "text" })
-            .expect(StatusCodes.BAD_REQUEST)
-
-    });
-
-    it('circular lookup', async function () {
-        const sheet = (await getSheetById(sheetId))!
-        await sendPutRequest(sheet, { columnId: sheet.columns[0]._id, row: 1, value: true });
-        await sendPutRequest(sheet, { columnId: sheet.columns[4]._id, row: 5, value: `lookup(${sheet.columns[5]._id},80)` });
-        await sendPutRequest(sheet, { columnId: sheet.columns[5]._id, row: 80, value: `lookup(${sheet.columns[6]._id},4)` });
-        await sendPutRequest(sheet, { columnId: sheet.columns[6]._id, row: 4, value: `lookup(${sheet.columns[0]._id},1)` });
-
-        await request(app)
-            .put(`/sheet/${sheetId}`)
-            .set('Content-Type', 'application/json')
-            .set('Accept', 'application/json')
-            .send({ columnId: sheet.columns[0]._id, row: 1, value: `lookup(${sheet.columns[4]._id},5)` })
-            .expect(StatusCodes.BAD_REQUEST)
-
-    });
-
-    it('Fails because sheet dosent exists', function (done) {
-        request(app)
-            .get(`/sheet/${"badId"}`)
-            .set('Content-Type', 'application/json')
-            .set('Accept', 'application/json')
-            .expect(StatusCodes.NOT_FOUND)
-            .end(done)
-    });
-
 
 });
 

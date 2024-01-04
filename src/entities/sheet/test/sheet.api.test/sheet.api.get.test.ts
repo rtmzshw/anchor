@@ -30,8 +30,6 @@ afterEach(async () => {
     await SheetModel.deleteMany({})
 });
 
-
-
 afterAll(async () => {
     await disconnectDb()
 });
@@ -39,7 +37,6 @@ afterAll(async () => {
 describe('GET /sheet/:sheetId', () => {
     it('responds with a basic sheet', async function () {
         const sheet = (await getSheetById(sheetId))!
-
         await updateColumnValue(sheetId, sheet.columns[0]._id, 1, true)
         await updateColumnValue(sheetId, sheet.columns[1]._id, 5, 7)
         await updateColumnValue(sheetId, sheet.columns[2]._id, 80, 12.4)

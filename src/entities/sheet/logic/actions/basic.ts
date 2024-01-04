@@ -3,12 +3,12 @@ import { ColumnType, Sheet } from "../../sheet.type"
 import { Action } from "./action"
 
 export class BasicAction implements Action {
-
+    constructor() { }
     calcValue = (sheet: Sheet, value: any) => {
         return value
     }
 
-     validate = async (sheetId: string, columnId: string, value: any): Promise<boolean> => {
+    validate = async (sheetId: string, columnId: string, row: number, value: any): Promise<boolean> => {
         const result = (await getColumn(sheetId, columnId))!
         const { type } = result.columns[0]
         return validateValueByType[type](value)

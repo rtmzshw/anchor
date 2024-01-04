@@ -4,6 +4,7 @@ import { isLookup } from "../../sheet.utils"
 import { Action } from './action'
 
 export class Lookup implements Action {
+
     calcValue = (sheet: Sheet, value: any): any => {
         const [lookupColId, lookupRow] = getColIdAndRowFromLookup(value)
 
@@ -12,12 +13,12 @@ export class Lookup implements Action {
             return this.calcValue(sheet, nextCell)
         }
 
-        //TODO optimize it to change sheet value here
         return nextCell ?? null
     }
 
     validate = async (sheetId: string, columnId: string,row:number, value: any): Promise<boolean> => {
         const sheet: Sheet = (await getSheetById(sheetId))!
+        
         const columnToInsertTo = sheet.columns.find(column => column._id.toString() === columnId)!
 
         const [lookupColId, lookupRow] = getColIdAndRowFromLookup(value)
@@ -37,7 +38,6 @@ export class Lookup implements Action {
 }
 
 const isCircular = (set: Set<String>, nextCellColId: string, nextCellRow: number, sheet: Sheet): boolean => {
-console.log(set);
 
     if (isCicular(set, nextCellColId, nextCellRow))
         return true
