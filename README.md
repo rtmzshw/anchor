@@ -1,6 +1,7 @@
 ### Run
 * run ```docker pull mongodb/mongodb-community-server```
-* run ```docker run mongodb -d -p 27017:27017 mongodb/mongodb-community-server\```
+* run ```docker run --name mongodb -d -p 27017:27017 mongodb/mongodb-community-server```
+* 
 * install node if you haven't https://nodejs.org/en/download
 * run  ```npm install```
 * run  ```npm run start```
