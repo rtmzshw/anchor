@@ -10,5 +10,5 @@
 * run  ```npm run test```
 
 #### assumptions
-A sheet might have the same column name twice to i used ID for the api's instead of column name.
-/n A sheet values might not be sequential
+A sheet might have the same column name twice to i used ID for the api's instead of column name.\
+A sheet values might not be sequential
